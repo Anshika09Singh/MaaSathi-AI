@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account — MaaSathi AI</title>
+  <meta name="description" content="Create your free MaaSathi AI account — intelligent life assistant for mothers." />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="auth-card">
+    <a href="/" class="back-link">← Back to home</a>
+
+    <a href="/" class="auth-logo">
+      <span>🌸</span>
+      <span>MaaSathi <span class="logo-ai">AI</span></span>
+    </a>
+
+    <h1 class="auth-heading">Create your account</h1>
+    <p class="auth-sub">Free forever · 100% local AI · No cloud required</p>
+
+    <div id="errorMsg" class="error-msg"></div>
+
+    <form class="auth-form" id="registerForm" novalidate>
+
+      <div class="form-group">
+        <label class="form-label" for="name">Full name</label>
+        <input
+          class="form-input"
+          type="text"
+          id="name"
+          name="name"
+          placeholder="Your name"
+          autocomplete="name"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="email">Email address</label>
+        <input
+          class="form-input"
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="At least 6 characters"
+            autocomplete="new-password"
+            required
+          />
+          <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">👁</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="confirm">Confirm password</label>
+        <div class="input-wrap">
+          <input
+            class="form-input"
+            type="password"
+            id="confirm"
+            name="confirm"
+            placeholder="Repeat your password"
+            autocomplete="new-password"
+            required
+          />
+          <button type="button" class="toggle-pw" id="toggleConfirm" aria-label="Toggle confirm">👁</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span class="spinner"></span>
+        <span class="btn-text">Create account</span>
+      </button>
+    </form>
+
+    <div id="successOverlay" class="success-overlay">
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Account created!</div>
+      <div class="success-sub">Taking you to your dashboard…</div>
+    </div>
+
+    <p class="auth-switch">
+      Already have an account? <a href="/login.html">Sign in</a>
+    </p>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5000';
+
+    // Redirect if already logged in
+    fetch(`${API}/api/auth/me`, { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { if (d.authenticated) window.location.href = '/dashboard.html'; })
+      .catch(() => {});
+
+    // Password toggles
+    function makeToggle(btnId, inputId) {
+      document.getElementById(btnId).addEventListener('click', () => {
+        const el = document.getElementById(inputId);
+        el.type = el.type === 'password' ? 'text' : 'password';
+      });
+    }
+    makeToggle('togglePw', 'password');
+    makeToggle('toggleConfirm', 'confirm');
+
+    // Register form
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn   = document.getElementById('submitBtn');
+      const errEl = document.getElementById('errorMsg');
+      errEl.classList.remove('show');
+
+      const name     = document.getElementById('name').value.trim();
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+      const confirm  = document.getElementById('confirm').value;
+
+      if (!name || !email || !password || !confirm) {
+        errEl.textContent = 'Please fill in all fields.';
+        errEl.classList.add('show');
+        return;
+      }
+      if (password.length < 6) {
+        errEl.textContent = 'Password must be at least 6 characters.';
+        errEl.classList.add('show');
+        return;
+      }
+      if (password !== confirm) {
+        errEl.textContent = 'Passwords do not match.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const res  = await fetch(`${API}/api/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ name, email, password }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Registration failed. Please try again.';
+          errEl.classList.add('show');
+          btn.classList.remove('loading');
+          btn.disabled = false;
+          return;
+        }
+
+        document.getElementById('registerForm').style.display = 'none';
+        document.getElementById('successOverlay').classList.add('show');
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 1500);
+
+      } catch (err) {
+        errEl.textContent = 'Cannot connect to the server. Is the backend running?';
+        errEl.classList.add('show');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

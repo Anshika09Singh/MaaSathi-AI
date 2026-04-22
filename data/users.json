@@ -1,0 +1,18 @@
+{
+  "anshika1104singh@gmail.com": {
+    "id": "60301b24-7891-43fb-9a84-7fd44664d110",
+    "name": "Anshika Singh",
+    "email": "anshika1104singh@gmail.com",
+    "password": "42040c090cd7cd1bf30e890331e7bf6f33d39952433f390137233492b5dac9af",
+    "created_at": "2026-04-20T15:57:39.389354",
+    "avatar": "A"
+  },
+  "kishu2003singh@gmail.com": {
+    "id": "475f8d09-b9e6-4d57-bf61-7c1dbd3e1d76",
+    "name": "Anshika Singh",
+    "email": "kishu2003singh@gmail.com",
+    "password": "b5cdc33bca8fe15aea4bde2cdeb3cd8c4c0856dd1b0db01ff932e1a266a05ba4",
+    "created_at": "2026-04-20T16:18:03.238280",
+    "avatar": "A"
+  }
+}

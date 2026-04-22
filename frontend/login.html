@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In — MaaSathi AI</title>
+  <meta name="description" content="Sign in to MaaSathi AI — your intelligent personal assistant for mothers." />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+  </div>
+
+  <div class="auth-card">
+    <a href="/" class="back-link">← Back to home</a>
+
+    <a href="/" class="auth-logo">
+      <span>🌸</span>
+      <span>MaaSathi <span class="logo-ai">AI</span></span>
+    </a>
+
+    <h1 class="auth-heading">Welcome back</h1>
+    <p class="auth-sub">Sign in to your MaaSathi dashboard</p>
+
+    <div id="errorMsg" class="error-msg"></div>
+
+    <form class="auth-form" id="loginForm" novalidate>
+      <div class="form-group">
+        <label class="form-label" for="email">Email address</label>
+        <input
+          class="form-input"
+          type="email"
+          id="email"
+          name="email"
+          placeholder="you@example.com"
+          autocomplete="email"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrap">
+          <input
+            class="form-input"
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="current-password"
+            required
+          />
+          <button type="button" class="toggle-pw" id="togglePw" aria-label="Toggle password">👁</button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <span class="spinner"></span>
+        <span class="btn-text">Sign in</span>
+      </button>
+    </form>
+
+    <div id="successOverlay" class="success-overlay">
+      <div class="success-icon">✅</div>
+      <div class="success-title">Signed in successfully!</div>
+      <div class="success-sub">Redirecting to your dashboard…</div>
+    </div>
+
+    <p class="auth-switch">
+      Don't have an account? <a href="/register.html">Create one free</a>
+    </p>
+  </div>
+
+  <script>
+    const API = 'http://127.0.0.1:5000';
+
+    // Redirect if already logged in
+    fetch(`${API}/api/auth/me`, { credentials: 'include' })
+      .then(r => r.json())
+      .then(d => { if (d.authenticated) window.location.href = '/dashboard.html'; })
+      .catch(() => {});
+
+    // Toggle password visibility
+    document.getElementById('togglePw').addEventListener('click', () => {
+      const pw = document.getElementById('password');
+      pw.type = pw.type === 'password' ? 'text' : 'password';
+    });
+
+    // Login form
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn   = document.getElementById('submitBtn');
+      const errEl = document.getElementById('errorMsg');
+      errEl.classList.remove('show');
+
+      const email    = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        errEl.textContent = 'Please fill in all fields.';
+        errEl.classList.add('show');
+        return;
+      }
+
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const res  = await fetch(`${API}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          errEl.textContent = data.error || 'Login failed. Please try again.';
+          errEl.classList.add('show');
+          btn.classList.remove('loading');
+          btn.disabled = false;
+          return;
+        }
+
+        // Success
+        document.getElementById('loginForm').style.display = 'none';
+        document.getElementById('successOverlay').classList.add('show');
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 1500);
+
+      } catch (err) {
+        errEl.textContent = 'Cannot connect to the server. Is the backend running?';
+        errEl.classList.add('show');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

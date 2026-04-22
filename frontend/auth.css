@@ -1,0 +1,213 @@
+/* ══════════════════════════════════════════════════════════════
+   MaaSathi AI — Auth Pages (Login & Register) Shared CSS
+══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:      #050814;
+  --surface: #0d1117;
+  --border:  rgba(255,255,255,.07);
+  --text:    #e2e8f0;
+  --muted:   #8892a4;
+  --cyan:    #22d3ee;
+  --violet:  #818cf8;
+  --rose:    #f43f5e;
+  --grad-a:  #7c3aed;
+  --grad-b:  #06b6d4;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Orbs ─────────────────────────────────────────────────── */
+.bg-orbs { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: .3;
+}
+.orb-1 { width: 600px; height: 600px; top: -30%; left: -20%; background: #4f46e5; }
+.orb-2 { width: 500px; height: 500px; bottom: -20%; right: -15%; background: #0891b2; opacity: .2; }
+
+/* ── Card ─────────────────────────────────────────────────── */
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  background: rgba(13,17,23,.9);
+  border: 1px solid var(--border);
+  border-radius: 1.75rem;
+  padding: 2.5rem 2.25rem;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 50px 150px rgba(0,0,0,.5);
+}
+
+/* ── Logo ─────────────────────────────────────────────────── */
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  margin-bottom: 2rem;
+}
+.auth-logo .logo-ai { color: var(--cyan); }
+
+/* ── Heading ──────────────────────────────────────────────── */
+.auth-heading { font-size: 1.65rem; font-weight: 800; margin-bottom: .4rem; }
+.auth-sub { font-size: .875rem; color: var(--muted); margin-bottom: 1.75rem; }
+
+/* ── Form ─────────────────────────────────────────────────── */
+.auth-form { display: flex; flex-direction: column; gap: 1rem; }
+
+.form-group { display: flex; flex-direction: column; gap: .4rem; }
+.form-label { font-size: .82rem; font-weight: 600; color: var(--muted); }
+
+.form-input {
+  padding: .8rem 1rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  border-radius: .85rem;
+  color: var(--text);
+  font-size: .95rem;
+  font-family: 'Inter', sans-serif;
+  outline: none;
+  transition: border-color .2s, background .2s;
+}
+.form-input:focus {
+  border-color: var(--cyan);
+  background: rgba(34,211,238,.05);
+}
+.form-input::placeholder { color: rgba(136,146,164,.5); }
+
+/* Password wrapper */
+.input-wrap { position: relative; }
+.input-wrap .form-input { width: 100%; padding-right: 2.8rem; }
+.toggle-pw {
+  position: absolute;
+  right: .9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  transition: color .2s;
+}
+.toggle-pw:hover { color: var(--text); }
+
+/* ── Error message ────────────────────────────────────────── */
+.error-msg {
+  display: none;
+  font-size: .8rem;
+  color: var(--rose);
+  background: rgba(244,63,94,.08);
+  border: 1px solid rgba(244,63,94,.2);
+  padding: .6rem .9rem;
+  border-radius: .7rem;
+}
+.error-msg.show { display: block; }
+
+/* ── Submit button ────────────────────────────────────────── */
+.btn-submit {
+  padding: .9rem;
+  border-radius: .85rem;
+  background: linear-gradient(135deg, var(--grad-a), var(--grad-b));
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer;
+  transition: opacity .2s, transform .15s, box-shadow .2s;
+  margin-top: .25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .6rem;
+}
+.btn-submit:hover { opacity: .88; transform: translateY(-1px); box-shadow: 0 8px 30px rgba(124,58,237,.4); }
+.btn-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+
+/* ── Spinner ──────────────────────────────────────────────── */
+.spinner {
+  width: 18px; height: 18px;
+  border: 2.5px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  display: none;
+}
+.btn-submit.loading .spinner { display: block; }
+.btn-submit.loading .btn-text { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Divider ──────────────────────────────────────────────── */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  color: var(--muted);
+  font-size: .78rem;
+  margin: .5rem 0;
+}
+.auth-divider::before, .auth-divider::after {
+  content:''; flex: 1; height: 1px; background: var(--border);
+}
+
+/* ── Switch link ──────────────────────────────────────────── */
+.auth-switch {
+  text-align: center;
+  font-size: .85rem;
+  color: var(--muted);
+  margin-top: 1.25rem;
+}
+.auth-switch a { color: var(--cyan); font-weight: 600; text-decoration: none; }
+.auth-switch a:hover { text-decoration: underline; }
+
+/* ── Back link ────────────────────────────────────────────── */
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .8rem;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+  transition: color .2s;
+}
+.back-link:hover { color: var(--text); }
+
+/* ── Success state ────────────────────────────────────────── */
+.success-overlay {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-align: center;
+  padding: 1rem 0;
+}
+.success-overlay.show { display: flex; }
+.success-icon { font-size: 3.5rem; animation: pop .4s ease; }
+@keyframes pop { 0%{transform:scale(.5); opacity:0} 80%{transform:scale(1.1)} 100%{transform:scale(1);opacity:1} }
+.success-title { font-size: 1.25rem; font-weight: 700; }
+.success-sub { font-size: .875rem; color: var(--muted); }

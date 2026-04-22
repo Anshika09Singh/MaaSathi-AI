@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — MaaSathi AI</title>
+  <meta name="description" content="MaaSathi AI dashboard — manage tasks, meals, reminders and chat with Groq AI plus Ollama backup." />
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+
+<!-- ══ LOADING ══ -->
+<div id="loadingScreen">
+  <div class="load-spinner"></div>
+  <div class="load-text">Loading MaaSathi AI…</div>
+</div>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <span>🌸</span>
+    <span>MaaSathi <span class="logo-ai">AI</span></span>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <div class="nav-item active" data-section="overview">
+      <span class="nav-icon">📊</span> Overview
+    </div>
+    <div class="nav-item" data-section="chat">
+      <span class="nav-icon">💬</span> AI Chat
+    </div>
+
+    <div class="nav-section-label" style="margin-top:.5rem">Manage</div>
+    <div class="nav-item" data-section="tasks">
+      <span class="nav-icon">✅</span> Tasks
+    </div>
+    <div class="nav-item" data-section="reminders">
+      <span class="nav-icon">🔔</span> Reminders
+    </div>
+    <div class="nav-item" data-section="meals">
+      <span class="nav-icon">🥗</span> Meal Planner
+    </div>
+    <div class="nav-item" data-section="safety">
+      <span class="nav-icon">🛡️</span> Safety
+    </div>
+  </nav>
+
+  <!-- AI status -->
+  <div class="ai-status" id="aiStatus">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Checking AI…</span>
+  </div>
+
+  <!-- User info -->
+  <div class="sidebar-user">
+    <div class="user-avatar" id="sidebarAvatar">M</div>
+    <div class="user-info">
+      <div class="user-name" id="sidebarName">Loading…</div>
+      <div class="user-email" id="sidebarEmail"></div>
+    </div>
+    <button class="logout-btn" id="logoutBtn" title="Logout">⏻</button>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+
+  <!-- Top Bar -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <button class="hamburger-dash" id="hamburgerDash">
+        <span></span><span></span><span></span>
+      </button>
+      <div>
+        <div class="page-title" id="pageTitle">Overview</div>
+        <div class="page-sub" id="pageSub">Your family at a glance</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="sos-btn" id="sosBtn">🆘 SOS</button>
+    </div>
+  </div>
+
+  <!-- ══════════ OVERVIEW SECTION ══════════ -->
+  <div class="content active" id="section-overview">
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">Tasks</div>
+        <div class="stat-value" style="color:var(--cyan)" id="ovTaskCount">—</div>
+        <div class="stat-change" id="ovOpenTasks">open tasks</div>
+        <div class="stat-icon">✅</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Reminders</div>
+        <div class="stat-value" style="color:var(--violet)" id="ovRemCount">—</div>
+        <div class="stat-change" id="ovUrgentRem">high priority</div>
+        <div class="stat-icon">🔔</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Meals Planned</div>
+        <div class="stat-value" style="color:var(--emerald)" id="ovMealCount">—</div>
+        <div class="stat-change">nutrition plans</div>
+        <div class="stat-icon">🥗</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Safety Logs</div>
+        <div class="stat-value" style="color:var(--rose)" id="ovSafetyCount">—</div>
+        <div class="stat-change">active logs</div>
+        <div class="stat-icon">🛡️</div>
+      </div>
+    </div>
+
+    <div class="two-col">
+      <!-- Quick Chat Preview -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">💬 Quick Chat</div>
+            <div class="panel-sub">Ask MaaSathi anything</div>
+          </div>
+        </div>
+        <div class="panel-body" style="padding:0; display:flex; flex-direction:column;">
+          <div class="chat-window" id="ovChatWindow" style="padding:1rem;"></div>
+          <form class="chat-form" id="ovChatForm">
+            <input class="chat-input" id="ovChatInput" type="text" placeholder="Ask MaaSathi anything…" />
+            <button class="chat-send" type="submit" id="ovChatSend">Send</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Status panels -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">📋 Current Plan</div>
+            <div class="panel-sub">AI recommendations</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div style="display:flex;flex-direction:column;gap:.85rem">
+            <div>
+              <div style="font-size:.75rem;font-weight:600;color:var(--cyan);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.07em">Next Action</div>
+              <div class="advice-box" id="ovNextAction">Loading…</div>
+            </div>
+            <div>
+              <div style="font-size:.75rem;font-weight:600;color:var(--emerald);margin-bottom:.35rem;text-transform:uppercase;letter-spacing:.07em">Safety Note</div>
+              <div class="advice-box" id="ovSafetyTip">Loading…</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:1.25rem;">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">⚡ Energy-Smart Day Plan</div>
+          <div class="panel-sub">A realistic motherhood plan based on your energy, time, and today’s focus</div>
+        </div>
+      </div>
+      <div class="panel-body" style="display:flex; flex-direction:column; gap:1rem;">
+        <form id="dayPlanForm" class="form-row">
+          <select class="field-select" id="energyLevel">
+            <option value="low">Low energy</option>
+            <option value="medium" selected>Medium energy</option>
+            <option value="high">High energy</option>
+          </select>
+          <input class="field-input" id="availableMinutes" type="number" min="15" step="15" value="90" placeholder="Minutes available" style="max-width:180px;" />
+          <input class="field-input" id="focusArea" type="text" placeholder="Today’s focus: baby care, meals, chores, recovery…" />
+          <button class="btn-gen" id="dayPlanBtn" type="submit">Create Plan</button>
+        </form>
+        <div id="dayPlanResult" style="display:none;">
+          <div style="font-size:.78rem;font-weight:600;color:var(--cyan);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.07em;">Today’s AI Plan</div>
+          <div class="advice-box" id="dayPlanText"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ CHAT SECTION ══════════ -->
+  <div class="content" id="section-chat">
+    <div class="panel" style="max-width:760px; margin:0 auto; width:100%">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">💬 MaaSathi AI Chat</div>
+          <div class="panel-sub">Powered by Groq with Ollama backup · Context-aware via RAG memory</div>
+        </div>
+      </div>
+      <div class="panel-body" style="padding:0; display:flex; flex-direction:column;">
+        <div class="chat-window" id="mainChatWindow" style="height:430px; padding:1rem;"></div>
+        <form class="chat-form" id="mainChatForm">
+          <input class="chat-input" id="mainChatInput" type="text" placeholder="Ask me about tasks, meals, safety, planning…" />
+          <button class="chat-send" type="submit" id="mainChatSend">Send ›</button>
+        </form>
+      </div>
+    </div>
+    <div style="font-size:.75rem; color:var(--muted); text-align:center;">
+      Responses generated by Groq first with local Ollama backup using RAG + vector memory.
+    </div>
+  </div>
+
+  <!-- ══════════ TASKS SECTION ══════════ -->
+  <div class="content" id="section-tasks">
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">✅ Tasks</div>
+          <div class="panel-sub">AI-balanced household task management</div>
+        </div>
+        <button class="btn-gen" id="balanceBtn" style="font-size:.8rem; padding:.5rem .9rem;">⚡ AI Balance</button>
+      </div>
+      <div class="panel-body" style="display:flex; flex-direction:column; gap:1rem;">
+        <!-- Add task -->
+        <form id="taskForm" class="form-row">
+          <input class="field-input" id="taskTitle" type="text" placeholder="New task description…" required />
+          <select class="field-select" id="taskPriority">
+            <option value="high">High priority</option>
+            <option value="medium" selected>Medium</option>
+            <option value="low">Low</option>
+          </select>
+          <select class="field-select" id="taskAssigned">
+            <option value="Mom">Mom</option>
+            <option value="Dad">Dad</option>
+            <option value="Both">Both</option>
+            <option value="Kids">Kids</option>
+          </select>
+          <button class="btn-add" type="submit">+ Add</button>
+        </form>
+        <!-- Task list -->
+        <div class="list" id="taskList"></div>
+        <!-- Balance advice -->
+        <div id="balanceAdvice" style="display:none;">
+          <div style="font-size:.78rem;font-weight:600;color:var(--violet);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.07em;">AI Balance Suggestion</div>
+          <div class="advice-box" id="balanceResult"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ REMINDERS SECTION ══════════ -->
+  <div class="content" id="section-reminders">
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🔔 Reminders</div>
+            <div class="panel-sub">Smart priority detection — urgent/today auto-escalate</div>
+          </div>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:1rem;">
+          <form id="reminderForm" class="form-row">
+            <input class="field-input" id="reminderNote" type="text" placeholder="Reminder note… (say 'urgent' for high priority)" required />
+            <input class="field-input" id="reminderDue" type="text" placeholder="Due (e.g. today, tomorrow)" style="max-width:160px;" />
+            <button class="btn-add" type="submit">+ Add</button>
+          </form>
+          <div class="list" id="reminderList"></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🔊 Sound Controls</div>
+            <div class="panel-sub">Interactive alarm and notification levels for daily reminders</div>
+          </div>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:1rem;">
+          <div class="sound-control-card">
+            <div class="sound-row">
+              <div>
+                <div class="sound-label">Alarm Volume</div>
+                <div class="sound-help">Used for urgent reminders and SOS-style attention sounds</div>
+              </div>
+              <div class="sound-value" id="alarmVolumeValue">80%</div>
+            </div>
+            <input id="alarmVolume" class="volume-slider alarm-slider" type="range" min="0" max="100" value="80" />
+            <div class="sound-actions">
+              <button class="sound-test-btn alarm-test" type="button" id="testAlarmBtn">Test Alarm</button>
+            </div>
+          </div>
+
+          <div class="sound-control-card">
+            <div class="sound-row">
+              <div>
+                <div class="sound-label">Notification Volume</div>
+                <div class="sound-help">Used for gentle reminder pings and task confirmations</div>
+              </div>
+              <div class="sound-value" id="notificationVolumeValue">55%</div>
+            </div>
+            <input id="notificationVolume" class="volume-slider notice-slider" type="range" min="0" max="100" value="55" />
+            <div class="sound-actions">
+              <button class="sound-test-btn notice-test" type="button" id="testNotificationBtn">Test Notification</button>
+            </div>
+          </div>
+
+          <div class="advice-box" id="soundStatus">Interactive sound controls are ready. Use the sliders and test buttons to tune reminder audio.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ MEALS SECTION ══════════ -->
+  <div class="content" id="section-meals">
+    <div class="two-col">
+      <!-- Meal planner AI -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🥗 AI Meal Planner</div>
+            <div class="panel-sub">Enter ingredients → get a personalised meal plan</div>
+          </div>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:1rem;">
+          <form id="mealPlanForm" class="form-row">
+            <input class="field-input" id="ingredientsInput" type="text" placeholder="e.g. rice, spinach, eggs, lentils…" required />
+            <button class="btn-gen" id="planBtn" type="submit">🤖 Generate Plan</button>
+          </form>
+          <div id="mealPlanResult" style="display:none;">
+            <div style="font-size:.78rem;font-weight:600;color:var(--amber);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.07em;">AI Meal Plan</div>
+            <div class="advice-box" id="mealPlanText"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meal library -->
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">📖 Saved Meals</div>
+            <div class="panel-sub">Your family meal preferences</div>
+          </div>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:1rem;">
+          <form id="mealAddForm" class="form-row">
+            <input class="field-input" id="mealDescription" type="text" placeholder="Meal description…" required />
+            <button class="btn-add" type="submit">+ Save</button>
+          </form>
+          <div class="list" id="mealList"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════ SAFETY SECTION ══════════ -->
+  <div class="content" id="section-safety">
+    <div class="two-col">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🆘 Emergency SOS</div>
+            <div class="panel-sub">Trigger an AI safety response immediately</div>
+          </div>
+        </div>
+        <div class="panel-body" style="display:flex; flex-direction:column; gap:1rem;">
+          <p style="font-size:.875rem; color:var(--muted); line-height:1.6;">
+            Press the SOS button to get immediate AI-generated safety guidance. Your alert is logged with a timestamp and can be reviewed anytime.
+          </p>
+          <button class="sos-btn" id="safetySOSBtn" style="width:100%; justify-content:center; font-size:1rem; padding:.9rem;">
+            🆘 Trigger Emergency SOS
+          </button>
+          <div id="sosResult" style="display:none;">
+            <div style="font-size:.78rem;font-weight:600;color:var(--rose);margin-bottom:.4rem;text-transform:uppercase;letter-spacing:.07em;">AI Safety Guidance</div>
+            <div class="advice-box" id="sosResultText"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">📋 Safety Log</div>
+            <div class="panel-sub">All safety notes and alerts</div>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="safety-log" id="safetyLog"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- Sidebar overlay (mobile) -->
+<div id="sidebarOverlay" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:49;"
+     onclick="closeSidebar()"></div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
